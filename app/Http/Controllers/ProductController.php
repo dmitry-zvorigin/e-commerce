@@ -197,16 +197,10 @@ class ProductController extends Controller
 
     public function loadAttributes(Request $request)
     {
-        // if ($request->has('group_id')) {
-            $groupId = $request->input('group_id');
-            $attributes = Product_attribute::where('group_id', $groupId)->get();
+        $groupId = $request->input('group_id');
+        $attributes = Product_attribute::where('group_id', $groupId)->get();
 
-            return response()->json($attributes);
-        // }
-
-        $groupAttributes = Group_attribute::all();
-
-        return view('attributes.create', ['groupAttributes' => $groupAttributes]);
+        return response()->json($attributes);
     }
 
     public function loadValue(Request $request)
@@ -219,6 +213,7 @@ class ProductController extends Controller
 
     public function saveAttributes(Request $request) : RedirectResponse
     {
+        //TODO
         dd($request);
         return redirect()->route('')->with('success','Характеристика успешно создана');
     }
