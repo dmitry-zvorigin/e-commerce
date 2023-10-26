@@ -48,6 +48,11 @@ Route::group(['prefix'=> 'categories'], function () {
 });
 
 Route::group(['prefix' => 'products'], function () {
+    Route::get('/create-attributes/{product}', [ProductController::class,'createAttributes'])->name('admin.products.createAttributes');
+    Route::get('/load-attributes', [ProductController::class, 'loadAttributes'])->name('admin.products.loadAttributes');
+    Route::get('/load-values', [ProductController::class, 'loadValue'])->name('admin.products.loadValue');
+    Route::post('/save-attributes', [ProductController::class, 'saveAttributes'])->name('admin.products.saveAttributes');
+
     Route::get('/create', [ProductController::class, 'create'])->name('admin.products.create');
     Route::post('/', [ProductController::class, 'store'])->name('admin.products.store');
 
@@ -58,6 +63,10 @@ Route::group(['prefix' => 'products'], function () {
     Route::put('/{product}', [ProductController::class, 'update'])->name('admin.products.update');
 
     Route::delete('/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
+
+    Route::delete('/images/{image}', [ProductController::class, 'destroyImage'])->name('admin.products.destroyImage');
+
+
 });
 
 Route::group(['prefix'=> 'users'], function () {

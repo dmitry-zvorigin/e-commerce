@@ -72,7 +72,7 @@
                 @enderror
 
                 <label for="price">Price:</label>
-                <input type="number" name="price" id="price" class="form-control" value="{{ old('name') }}">
+                <input type="number" name="price" id="price" class="form-control" value="{{ old('price') }}">
                 @error('price')
                     <p><span class="text-danger">{{ $message }}</span></p>
                 @enderror
@@ -88,13 +88,6 @@
 
             <button type="submit" class="btn btn-primary">Создать</button>
         </form>
-{{--
-        <form method="post" action="{{ route('admin.products.store') }}" enctype="multipart/form-data">
-            @csrf
-            <label>Добавить изображения</label>
-            <input name="files[]" type="file" multiple>
-            <button type="submit">Создать</button>
-        </form> --}}
     </div>
 
 </div>

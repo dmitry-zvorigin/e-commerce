@@ -5,20 +5,24 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductCreateRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
+use App\Models\Attribute_value;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Gallery_product;
+use App\Models\Group_attribute;
+use App\Models\Product_attribute;
 use App\Services\ProductFilterService;
 use App\Services\ProductService;
 use App\Services\ProductSortingService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Image;
 
 class ProductController extends Controller
 {
-
     public function __construct(
         private ProductService $productService,
         private ProductFilterService $productFilterService,
@@ -52,8 +56,9 @@ class ProductController extends Controller
     public function create() : View
     {
         $categories = Category::all();
+        $groupAttributes = Group_attribute::all();
 
-        return view('products.create', ['categories' => $categories]);
+        return view('products.create', ['categories' => $categories, 'groupAttributes' => $groupAttributes]);
     }
 
     public function store(Request $request) : RedirectResponse
@@ -64,8 +69,8 @@ class ProductController extends Controller
             'detail' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
-            'images' => 'array',
-            'images.*' => 'image|mimes:jpeg,png|max:2048',
+            'images' => 'array|max:4',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $product = new Product();
@@ -80,13 +85,26 @@ class ProductController extends Controller
 
         if($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-
                 $galleryProduct = new Gallery_product();
                 $galleryProduct->product_id = $product->id;
-                $galleryProduct->image = $image->getClientOriginalName();
-                $galleryProduct->thumbnail = $image->getClientOriginalName();
+                $imageName = $image->hashName();
+
+                $image->storeAs('gallery_products/images', $imageName);
+
+                $thumbnail = Image::make(storage_path('app/gallery_products/images/' . $imageName));
+                $thumbnail->resize(200, 200);
+                $thumbnailName = 'thumb_' . $imageName;
+                $thumbnail->save(storage_path('app/gallery_products/thumbnails/'. $thumbnailName));
+
+                $galleryProduct->image = $imageName;
+                $galleryProduct->thumbnail = $thumbnailName;
+
                 $galleryProduct->save();
-                $image->storeAs('gallery_products', $image->getClientOriginalName());
+
+                // $galleryProduct->thumbnail = $image->hashName();
+                // $galleryProduct->save();
+                // $image->storeAs('gallery_products/images', $image->hashName());
+                // $image->storeAs('gallery_products/thumbnail', $image->hashName());
             }
         }
 
@@ -110,6 +128,8 @@ class ProductController extends Controller
             'detail' => 'required|string',
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:0',
+            'images' => 'array|max:4',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $product->name = $request->input('name');
@@ -121,17 +141,87 @@ class ProductController extends Controller
 
         $product->update();
 
-        return redirect()->route('admin.products.show', ['product' => $product->slug]);
+        if($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $galleryProduct = new Gallery_product();
+                $galleryProduct->product_id = $product->id;
+                $imageName = $image->hashName();
+
+                $image->storeAs('gallery_products/images', $imageName);
+
+                $thumbnail = Image::make(storage_path('app/gallery_products/images/' . $imageName));
+                $thumbnail->resize(200, 200);
+                $thumbnailName = 'thumb_' . $imageName;
+                $thumbnail->save(storage_path('app/gallery_products/thumbnails/'. $thumbnailName));
+
+                $galleryProduct->image = $imageName;
+                $galleryProduct->thumbnail = $thumbnailName;
+
+                $galleryProduct->save();
+            }
+        }
+
+        return redirect()->route('admin.products.show', ['product' => $product->slug])->with('success', 'Продукт успешно изменен');
     }
 
     public function destroy(Product $product) : RedirectResponse
     {
+        foreach ($product->images as $image) {
+            Storage::delete('gallery_products/images/' . $image->image);
+            Storage::delete('gallery_products/thumbnails/' . $image->thumbnail);
+
+            $image->delete();
+        }
+
         $product->delete();
 
         return redirect()->route('admin.products.index')->with('success', 'Продукт успешно удален');
     }
 
+    public function destroyImage(Gallery_product $image) : RedirectResponse
+    {
+        Storage::delete('gallery_products/images/' . $image->image);
+        Storage::delete('gallery_products/thumbnails/'. $image->thumbnail);
 
+        $image->delete();
+
+        return redirect()->back()->with('success', 'Изображение удалено успешно');
+    }
+
+    public function createAttributes() : View
+    {
+        $groupAttributes = Group_attribute::all();
+
+        return view('attributes.create', ['groupAttributes' => $groupAttributes]);
+    }
+
+    public function loadAttributes(Request $request)
+    {
+        // if ($request->has('group_id')) {
+            $groupId = $request->input('group_id');
+            $attributes = Product_attribute::where('group_id', $groupId)->get();
+
+            return response()->json($attributes);
+        // }
+
+        $groupAttributes = Group_attribute::all();
+
+        return view('attributes.create', ['groupAttributes' => $groupAttributes]);
+    }
+
+    public function loadValue(Request $request)
+    {
+        $attributeId = $request->input('attribute_id');
+        $values = Attribute_value::where('attribute_id', $attributeId)->get();
+
+        return response()->json($values);
+    }
+
+    public function saveAttributes(Request $request) : RedirectResponse
+    {
+        dd($request);
+        return redirect()->route('')->with('success','Характеристика успешно создана');
+    }
 
 
 
