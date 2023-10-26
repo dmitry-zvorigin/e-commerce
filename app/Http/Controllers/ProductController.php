@@ -1,0 +1,200 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\ProductCreateRequest;
+use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductUpdateRequest;
+use App\Models\Category;
+use App\Models\Product;
+use App\Models\Gallery_product;
+use App\Services\ProductFilterService;
+use App\Services\ProductService;
+use App\Services\ProductSortingService;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+
+class ProductController extends Controller
+{
+
+    public function __construct(
+        private ProductService $productService,
+        private ProductFilterService $productFilterService,
+        private ProductSortingService $productSortingService,
+    ) {
+        $this->productFilterService = $productFilterService;
+        $this->productSortingService = $productSortingService;
+    }
+
+
+    public function show(string $slug) : View
+    {
+        $product = Product::whereSlug($slug)->firstOrFail();
+        return view('products.show', ['product' => $product]);
+    }
+
+
+    public function index(Request $request) : View
+    {
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $products = Product::search($search)->paginate(10);
+        } else {
+            $products = Product::with('category')->paginate(10);
+        }
+
+
+        return view('products.index', ['products' => $products]);
+    }
+
+    public function create() : View
+    {
+        $categories = Category::all();
+
+        return view('products.create', ['categories' => $categories]);
+    }
+
+    public function store(Request $request) : RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'detail' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'images' => 'array',
+            'images.*' => 'image|mimes:jpeg,png|max:2048',
+        ]);
+
+        $product = new Product();
+        $product->name = $request->input('name');
+        $product->slug = Str::slug($request->input('name'));
+        $product->description = $request->input('description');
+        $product->detail =  $request->input('detail');
+        $product->category_id = $request->input('category_id');
+        $product->price = $request->input('price');
+
+        $product->save();
+
+        if($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+
+                $galleryProduct = new Gallery_product();
+                $galleryProduct->product_id = $product->id;
+                $galleryProduct->image = $image->getClientOriginalName();
+                $galleryProduct->thumbnail = $image->getClientOriginalName();
+                $galleryProduct->save();
+                $image->storeAs('gallery_products', $image->getClientOriginalName());
+            }
+        }
+
+        return redirect()->route('admin.products.show', ['product' => $product->slug])->with('success', 'Продукт успешно создан');
+    }
+
+
+    public function edit(string $slug) : View
+    {
+        $categories = Category::all();
+        $product = Product::whereSlug($slug)->firstOrFail();
+
+        return view('products.edit', ['product' => $product, 'categories' => $categories]);
+    }
+
+    public function update(Request $request, Product $product) : RedirectResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'detail' => 'required|string',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+        ]);
+
+        $product->name = $request->input('name');
+        $product->slug = Str::slug($request->input('name'));
+        $product->description = $request->input('description');
+        $product->detail =  $request->input('detail');
+        $product->category_id = $request->input('category_id');
+        $product->price = $request->input('price');
+
+        $product->update();
+
+        return redirect()->route('admin.products.show', ['product' => $product->slug]);
+    }
+
+    public function destroy(Product $product) : RedirectResponse
+    {
+        $product->delete();
+
+        return redirect()->route('admin.products.index')->with('success', 'Продукт успешно удален');
+    }
+
+
+
+
+
+
+    // public function show(Product $product) : View
+    // {
+    //     return view('products.product', compact('product'));
+    // }
+
+
+
+    // public function index(ProductRequest $request) : View
+    // {
+    //     $filters = $request->safe()->only('color', 'category', 'min_price', 'max_price');
+    //     $sorting = $request->validated('sorting');
+
+    //     $categories = Category::all();
+    //     $colors = Product::distinct()->pluck('color');
+
+    //     // $products = Product::with('category')->filter($filters)->sorting($sorting)->paginate(10);
+
+    //     $query = Product::query();
+    //     $this->productFilterService->applyFilters($query, $filters);
+    //     $this->productSortingService->applySorting($query, $sorting);
+    //     $products = $query->with('category')->paginate(10);
+
+    //     return view('products.products', compact('products', 'categories', 'colors'));
+    // }
+
+
+
+    // public function store(ProductCreateRequest $productCreateRequest) : RedirectResponse
+    // {
+    //     $data = $productCreateRequest->validated();
+    //     $product = $this->productService->createProduct($data);
+
+    //     return redirect()->route('products.show', compact('product'));
+    // }
+
+    // public function update(ProductUpdateRequest $productUpdateRequest, Product $product) : RedirectResponse
+    // {
+    //     $data = $productUpdateRequest->validated();
+    //     $product = $this->productService->updateProduct($product, $data);
+
+    //     return redirect()->route('products.show', compact('product'));
+    // }
+
+    // public function edit(Product $product) : View
+    // {
+    //     return view('products.edit', compact('product'));
+    // }
+
+    // public function destroy(Product $product) : RedirectResponse
+    // {
+    //     $this->productService->deleteProduct($product);
+
+    //     return redirect()->route('products.index')->with('success', 'Product deleted successfully');
+    // }
+
+    // public function create() : View
+    // {
+    //     $categories = Category::all();
+
+    //     return view('products.create', compact('categories'));
+    // }
+}
