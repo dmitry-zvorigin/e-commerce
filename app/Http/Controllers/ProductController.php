@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Gallery_product;
 use App\Models\Group_attribute;
 use App\Models\Product_attribute;
+use App\Models\Product_characteristic;
 use App\Services\ProductFilterService;
 use App\Services\ProductService;
 use App\Services\ProductSortingService;
@@ -188,11 +189,18 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Изображение удалено успешно');
     }
 
-    public function createAttributes() : View
+    public function createAttributes($slug) : View
     {
+        $product = Product::whereSlug($slug)->firstOrFail();
+
         $groupAttributes = Group_attribute::all();
 
-        return view('attributes.create', ['groupAttributes' => $groupAttributes]);
+        return view('attributes.create', ['groupAttributes' => $groupAttributes, 'product' => $product]);
+    }
+
+    public function createGroupAttributes(Request $request)
+    {
+        dd($request);
     }
 
     public function loadAttributes(Request $request)
@@ -211,11 +219,21 @@ class ProductController extends Controller
         return response()->json($values);
     }
 
-    public function saveAttributes(Request $request) : RedirectResponse
+    public function saveAttributes(Request $request, $product) : RedirectResponse
     {
+        // dd($request, $product);
         //TODO
-        dd($request);
-        return redirect()->route('')->with('success','Характеристика успешно создана');
+        $product = Product::find($product);
+
+        $characteristics = new Product_characteristic();
+
+        $characteristics->product_id = $product->id;
+        $characteristics->attribute_id = $request->input('attribute_id');
+        $characteristics->value_id = $request->input('value_id');
+
+        $characteristics->save();
+
+        return redirect()->route('admin.products.show', ['product' => $product->slug])->with('success','Характеристика успешно создана');
     }
 
 

@@ -48,10 +48,10 @@ Route::group(['prefix'=> 'categories'], function () {
 });
 
 Route::group(['prefix' => 'products'], function () {
-    Route::get('/create-attributes/{product}', [ProductController::class,'createAttributes'])->name('admin.products.createAttributes');
+    // Route::get('/create-attributes/{product}', [ProductController::class,'createAttributes'])->name('admin.products.createAttributes');
     Route::get('/load-attributes', [ProductController::class, 'loadAttributes'])->name('admin.products.loadAttributes');
     Route::get('/load-values', [ProductController::class, 'loadValue'])->name('admin.products.loadValue');
-    Route::post('/save-attributes', [ProductController::class, 'saveAttributes'])->name('admin.products.saveAttributes');
+
 
     Route::get('/create', [ProductController::class, 'create'])->name('admin.products.create');
     Route::post('/', [ProductController::class, 'store'])->name('admin.products.store');
@@ -61,6 +61,10 @@ Route::group(['prefix' => 'products'], function () {
 
     Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('admin.products.edit');
     Route::put('/{product}', [ProductController::class, 'update'])->name('admin.products.update');
+
+    Route::get('/{product}/create-attributes', [ProductController::class,'createAttributes'])->name('admin.products.createAttributes');
+    Route::post('/{product}/save-attributes', [ProductController::class, 'saveAttributes'])->name('admin.products.saveAttributes');
+
 
     Route::delete('/{product}', [ProductController::class, 'destroy'])->name('admin.products.destroy');
 
@@ -76,13 +80,17 @@ Route::group(['prefix'=> 'users'], function () {
 Route::group(['prefix' => 'attributes'], function () {
     Route::get('/', [AttributeController::class,'index'])->name('admin.attribute.index');
 
-    Route::get('/group/create', [AttributeController::class,'createGroup'])->name('admin.attributes.createGroup');
+    Route::post('/create-group', [AttributeController::class, 'createGroupAttribute'])->name('admin.attribute.createGroup');
+    Route::post('/create-attribute', [AttributeController::class, 'createAttribute'])->name('admin.attribute.createAttribute');
+    Route::post('/create-value', [AttributeController::class,'createValue'])->name('admin.attribute.createValue');
+
+    // Route::get('/group/create', [AttributeController::class,'createGroup'])->name('admin.attributes.createGroup');
     Route::post('/group/store', [AttributeController::class, 'storeGroup'])->name('admin.attributes.storeGroup');
 
-    Route::get('/attribute/create', [AttributeController::class,'createAttribute'])->name('admin.attributes.createAttribute');
+    // Route::get('/attribute/create', [AttributeController::class,'createAttribute'])->name('admin.attributes.createAttribute');
     Route::post('/attribute/store', [AttributeController::class, 'storeAttribute'])->name('admin.attributes.storeAttribute');
 
-    Route::get('/value/create', [AttributeController::class,'createValue'])->name('admin.attributes.createValue');
+    // Route::get('/value/create', [AttributeController::class,'createValue'])->name('admin.attributes.createValue');
     Route::post('/value/store', [AttributeController::class, 'storeValue'])->name('admin.attributes.storeValue');
 
 });
