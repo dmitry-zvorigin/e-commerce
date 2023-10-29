@@ -14,31 +14,38 @@
             <div class="form-group mb-4">
                 <label for="group_id">Группа аттрибутов: </label>
                 <select name="group_id" id="group_id" class="form-control">
-                    <option selected disabled>Выберите группу атрибутов</option>
+                    <option selected>Выберите группу атрибутов</option>
                     @foreach ($groupAttributes as $group)
-                        <option value="{{ $group->id }}">{{ $group->name }}</option>
+                        <option value="{{ $group->id }}" @selected( (int) old('group_id') == $group->id) >{{ $group->name }}</option>
                     @endforeach
                 </select>
+                @error('group_id')
+                    <p><span class="text-danger">{{ $message }}</span></p>
+                @enderror
                 <div class="d-flex">
                     <input type="text" name="new_group" id="new_group" class="form-control" placeholder="Новая группа">
                     <button type="button" class="btn btn-primary" id="add_group_button">Добавить</button>
                 </div>
 
+
                 <label for="attribute_id">Аттрибут: </label>
                 <select name="attribute_id" id="attribute_id" class="form-control">
                     <option selected disabled>Выберите атрибут</option>
                 </select>
+                @error('attribute_id')
+                    <p><span class="text-danger">{{ $message }}</span></p>
+                @enderror
                 <div class="d-flex">
                     <input type="text" name="new_attribute" id="new_attribute" class="form-control" placeholder="Новый атрибут">
                     <button type="button" class="btn btn-primary" id="add_attribute_button">Добавить</button>
                 </div>
-                @error('new_attribute')
-                    1
-                @enderror
                 <label for="value_id">Значение: </label>
                 <select name="value_id" id="value_id" class="form-control">
                     <option selected disabled>Выберите значение</option>
                 </select>
+                @error('value_id')
+                    <p><span class="text-danger">{{ $message }}</span></p>
+                @enderror
                 <div class="d-flex">
                     <input type="text" name="new_value" id="new_value" class="form-control" placeholder="Новое значение">
                     <button type="button" class="btn btn-primary" id="add_value_button">Добавить</button>
@@ -74,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (selectedGroupId) {
             // Если выбрана группа, отправляем Ajax-запрос для загрузки атрибутов
-            fetch(`/products/load-attributes?group_id=${selectedGroupId}`)
+            fetch(`/attributes/load-attributes?group_id=${selectedGroupId}`)
                 .then(response => response.json())
                 .then(data => {
                     // Парсим JSON-ответ и добавляем атрибуты в выпадающий список
@@ -95,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (selectedAttributeId) {
             // Если выбран атрибут, отправляем Ajax-запрос для загрузки значений
-            fetch(`/products/load-values?attribute_id=${selectedAttributeId}`)
+            fetch(`/attributes/load-values?attribute_id=${selectedAttributeId}`)
                 .then(response => response.json())
                 .then(data => {
                     // Парсим JSON-ответ и добавляем значения в выпадающий список
@@ -145,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (newAttribute) {
-            fetch('/attributes/create-attribute', {
+            fetch('/attributes/create-attributes', {
                 method: 'POST',
                 body: JSON.stringify({ attribute_name: newAttribute, group_id: group }),
                 headers: {

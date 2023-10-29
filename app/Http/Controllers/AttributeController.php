@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Group_attribute;
 use App\Models\Product_attribute;
 use App\Models\Attribute_value;
+use App\Models\Product;
+use App\Models\Product_characteristic;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -97,7 +99,7 @@ class AttributeController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'group_id' => 'required|exists:group_attributes,id',
-            'attribute_name' => 'required|string|max:20'
+            'attribute_name' => 'required|string|max:50'
         ]);
 
         if ($validator->fails()) {
@@ -122,5 +124,55 @@ class AttributeController extends Controller
         $value->save();
 
         return response()->json($value);
+    }
+
+    public function saveAttributes(Request $request, $product) : RedirectResponse
+    {
+        // dd($request, $product);
+        //TODO
+        // dd($request);
+        $request->validate([
+            'group_id' => 'required|exists:group_attributes,id',
+            'attribute_id' => 'required|exists:product_attributes,id',
+            'value_id' => 'required|exists:attribute_values,id',
+        ]);
+
+        $product = Product::find($product);
+
+        $characteristics = new Product_characteristic();
+
+        $characteristics->product_id = $product->id;
+        $characteristics->group_id = $request->input('group_id');
+        $characteristics->attribute_id = $request->input('attribute_id');
+        $characteristics->value_id = $request->input('value_id');
+
+        $characteristics->save();
+
+        return redirect()->route('admin.products.edit', ['product' => $product->slug])->with('success','Характеристика успешно создана');
+    }
+
+    public function createAttributes($slug) : View
+    {
+        $product = Product::whereSlug($slug)->firstOrFail();
+
+        $groupAttributes = Group_attribute::all();
+
+        return view('attributes.create', ['groupAttributes' => $groupAttributes, 'product' => $product]);
+    }
+
+    public function loadAttributes(Request $request)
+    {
+        $groupId = $request->input('group_id');
+        $attributes = Product_attribute::where('group_id', $groupId)->get();
+
+        return response()->json($attributes);
+    }
+
+    public function loadValue(Request $request)
+    {
+        $attributeId = $request->input('attribute_id');
+        $values = Attribute_value::where('attribute_id', $attributeId)->get();
+
+        return response()->json($values);
     }
 }

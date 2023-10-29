@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductCreateRequest;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
-use App\Models\Attribute_value;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Gallery_product;
 use App\Models\Group_attribute;
-use App\Models\Product_attribute;
 use App\Models\Product_characteristic;
 use App\Services\ProductFilterService;
 use App\Services\ProductService;
@@ -37,6 +35,7 @@ class ProductController extends Controller
     public function show(string $slug) : View
     {
         $product = Product::whereSlug($slug)->firstOrFail();
+        $product->characteristics = $product->characteristics->groupBy('group_id');
         return view('products.show', ['product' => $product]);
     }
 
@@ -57,9 +56,8 @@ class ProductController extends Controller
     public function create() : View
     {
         $categories = Category::all();
-        $groupAttributes = Group_attribute::all();
 
-        return view('products.create', ['categories' => $categories, 'groupAttributes' => $groupAttributes]);
+        return view('products.create', ['categories' => $categories]);
     }
 
     public function store(Request $request) : RedirectResponse
@@ -116,9 +114,13 @@ class ProductController extends Controller
     public function edit(string $slug) : View
     {
         $categories = Category::all();
-        $product = Product::whereSlug($slug)->firstOrFail();
 
-        return view('products.edit', ['product' => $product, 'categories' => $categories]);
+        $product = Product::whereSlug($slug)->firstOrFail();
+        $product->characteristics = $product->characteristics->groupBy('group_id');
+
+        $groupAttributes = Group_attribute::all();
+
+        return view('products.edit', ['product' => $product, 'categories' => $categories, 'groupAttributes' => $groupAttributes]);
     }
 
     public function update(Request $request, Product $product) : RedirectResponse
@@ -162,7 +164,7 @@ class ProductController extends Controller
             }
         }
 
-        return redirect()->route('admin.products.show', ['product' => $product->slug])->with('success', 'Продукт успешно изменен');
+        return redirect()->route('admin.products.edit', ['product' => $product->slug])->with('success', 'Продукт успешно изменен');
     }
 
     public function destroy(Product $product) : RedirectResponse
@@ -189,52 +191,21 @@ class ProductController extends Controller
         return redirect()->back()->with('success', 'Изображение удалено успешно');
     }
 
-    public function createAttributes($slug) : View
+    public function destroyCharacteristics(Product_characteristic $characteristics) : RedirectResponse
     {
-        $product = Product::whereSlug($slug)->firstOrFail();
+        $characteristics->delete();
 
-        $groupAttributes = Group_attribute::all();
-
-        return view('attributes.create', ['groupAttributes' => $groupAttributes, 'product' => $product]);
+        return redirect()->back()->with('success','Характеристика успешно удалена');
     }
 
-    public function createGroupAttributes(Request $request)
-    {
-        dd($request);
-    }
 
-    public function loadAttributes(Request $request)
-    {
-        $groupId = $request->input('group_id');
-        $attributes = Product_attribute::where('group_id', $groupId)->get();
 
-        return response()->json($attributes);
-    }
 
-    public function loadValue(Request $request)
-    {
-        $attributeId = $request->input('attribute_id');
-        $values = Attribute_value::where('attribute_id', $attributeId)->get();
 
-        return response()->json($values);
-    }
 
-    public function saveAttributes(Request $request, $product) : RedirectResponse
-    {
-        // dd($request, $product);
-        //TODO
-        $product = Product::find($product);
 
-        $characteristics = new Product_characteristic();
 
-        $characteristics->product_id = $product->id;
-        $characteristics->attribute_id = $request->input('attribute_id');
-        $characteristics->value_id = $request->input('value_id');
 
-        $characteristics->save();
-
-        return redirect()->route('admin.products.show', ['product' => $product->slug])->with('success','Характеристика успешно создана');
-    }
 
 
 

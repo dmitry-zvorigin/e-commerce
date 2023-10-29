@@ -12,15 +12,21 @@ class Product_characteristic extends Model
 
     protected $fillable = [
         'product_id',
+        'group_id',
         'attribute_name',
         'value_id',
     ];
 
     protected $with = [
+        'group',
         'attribute',
         'value',
     ];
 
+    public function group() : BelongsTo
+    {
+        return $this->belongsTo(Group_attribute::class);
+    }
 
     public function attribute() : BelongsTo
     {
@@ -31,4 +37,5 @@ class Product_characteristic extends Model
     {
         return $this->belongsTo(Attribute_value::class);
     }
+
 }

@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('product_characteristics', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('group_id');
             $table->unsignedBigInteger('attribute_id');
             $table->unsignedBigInteger('value_id');
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('group_id')->references('id')->on('group_attributes')->onDelete('cascade');
             $table->foreign('attribute_id')->references('id')->on('product_attributes')->onDelete('cascade');
             $table->foreign('value_id')->references('id')->on('attribute_values')->onDelete('cascade');
         });

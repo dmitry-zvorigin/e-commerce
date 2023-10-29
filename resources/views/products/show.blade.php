@@ -20,15 +20,17 @@
                 @method('DELETE')
                 <button class="btn btn-danger" type="submit" onclick="return confirm('Вы уверены, что хотите удалить этот продукт?')">Удалить</button>
             </form>
-            <a href="{{ route('admin.products.createAttributes', ['product' => $product->slug]) }}" class="btn btn-primary">Добавить характеристики</a>
         </div>
-        <div class="d-flex align-content-start justify-content-around flex-wrap">
-            @foreach ($product->images as $image)
-                <div>
-                    <img class="bd-placeholder-img img-thumbnail" src="{{ asset('gallery_products/thumbnails/' . $image->thumbnail) }}" alt="Описание изображения" width="200" height="200">
-                </div>
-            @endforeach
+        <div class="card">
+            <div class="d-flex align-content-start justify-content-around flex-wrap">
+                @foreach ($product->images as $image)
+                    <div class="card-body">
+                        <img class="bd-placeholder-img img-thumbnail" src="{{ asset('gallery_products/thumbnails/' . $image->thumbnail) }}" alt="Описание изображения" width="200" height="200">
+                    </div>
+                @endforeach
+            </div>
         </div>
+
         <div class="col">
             <div class="card">
                 <h3>Товар</h3>
@@ -54,8 +56,19 @@
             <div class="card">
                 <h3>Характеристики</h3>
                 <div class="card-body">
-                    @foreach ($product->characteristics as $characteristics)
-                        <p>{{ $characteristics->attribute->attribute_name }} => {{ $characteristics->value->value }}</p>
+                    @foreach ($product->characteristics as $group => $characteristics)
+                    <ul>
+                        <h4>{{ $characteristics->first()->group->name }}</h4>
+                        @foreach ($characteristics as $characteristic)
+                            <ol>
+                                <div class="d-flex justify-content-between">
+                                <p>{{ $characteristic->attribute->attribute_name }} => {{ $characteristic->value->value }}</p>
+                                </div>
+                            </ol>
+                        @endforeach
+                    </ul>
+
+
                     @endforeach
                 </div>
 
