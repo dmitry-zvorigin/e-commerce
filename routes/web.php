@@ -32,7 +32,7 @@ Route::get('/cart', [CartController::class,'index'])->name('cart');
 Route::get('/wishlist', [WishController::class,'index'])->name('wishlist');
 
 Route::group(['prefix' => 'catalog'], function () {
-    Route::get('/', [CatalogController::class,'index'])->name('catalog');
+    Route::get('/', [CatalogController::class,'catalog'])->name('catalog');
     Route::get('/{catagory}', [CatalogController::class,'category'])->name('catalog-category');
     Route::get('/{category}/{product}', [CatalogController::class,'product'])->name('catalog-product');
 });
