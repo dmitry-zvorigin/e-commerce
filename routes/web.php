@@ -31,10 +31,13 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/cart', [CartController::class,'index'])->name('cart');
 Route::get('/wishlist', [WishController::class,'index'])->name('wishlist');
 
+Route::get('/rewiew/{product}/create', [ProductController::class, 'createReview'])->name('review.create');
+Route::post('/rewiew/{product}/store', [ProductController::class,'storeReview'])->name('review.store');
+
 Route::group(['prefix' => 'catalog'], function () {
     Route::get('/', [CatalogController::class,'catalog'])->name('catalog');
-    Route::get('/{catagory}', [CatalogController::class,'category'])->name('catalog-category');
-    Route::get('/{category}/{product}', [CatalogController::class,'product'])->name('catalog-product');
+    Route::get('/{catagory}', [CatalogController::class,'category'])->name('catalog.category');
+    Route::get('/{category}/{product}', [CatalogController::class,'product'])->name('catalog.product');
 });
 
 Route::group(['prefix'=> 'categories'], function () {

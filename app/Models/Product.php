@@ -56,6 +56,11 @@ class Product extends Model
         return $this->hasMany(Gallery_product::class);
     }
 
+    public function averageRating() : string
+    {
+        return number_format($this->reviews()->avg('rating'), 2);
+    }
+
     // public function scopeFilter($query, array $filters) : Builder
     // {
     //     if (isset($filters['category'])) {

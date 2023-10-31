@@ -10,9 +10,11 @@ use App\Models\Product;
 use App\Models\Gallery_product;
 use App\Models\Group_attribute;
 use App\Models\Product_characteristic;
+use App\Models\Review;
 use App\Services\ProductFilterService;
 use App\Services\ProductService;
 use App\Services\ProductSortingService;
+use App\Services\RatingService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -199,6 +201,37 @@ class ProductController extends Controller
     }
 
 
+    public function createReview(string $product) : View
+    {
+        $product = Product::whereSlug($product)->firstOrFail();
+        return view('review.create', ['product' => $product]);
+    }
+
+    public function storeReview(Request $request, Product $product) : RedirectResponse
+    {
+        // dd($product);
+        $request->validate([
+            'dignities' => 'string',
+            'disadvantages' => 'string',
+            'comment' => 'string',
+            'rating' => 'required|numeric|min:1|max:5',
+            'images' => 'array|max:4',
+            'images.*' => 'image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $review = new Review([
+            'dignities' => $request->input('dignities'),
+            'disadvantages' => $request->input('disadvantages'),
+            'comment' => $request->input('comment'),
+            'rating' => $request->input('rating'),
+        ]);
+
+        $review->user()->associate(auth()->user());
+        $review->product()->associate($product);
+        $review->save();
+
+        return redirect()->route('catalog.product', ['category' => $product->category->slug,'product' => $product->slug])->with('success', 'Отзыв успешно создан');
+    }
 
 
 
