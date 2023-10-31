@@ -75,7 +75,6 @@
                             @endif
                         </div>
                         <div class="col-md-6">
-
                                 <div class="card-body">
                                     <a href="{{ route('catalog.product', ['category' => $category->slug, 'product' => $product->slug]) }}">
                                         <div>
@@ -83,7 +82,19 @@
                                             <p class="card-text">{{ $product->detail }}</ya-tr-span></p>
                                         </div>
                                     </a>
-                                    <p class="card-text">Рейтинг</p>
+                                    <div class="product-rating d-flex align-items-center">
+                                        @for ($i = 0; $i < 5; $i++)
+                                            @if ($i < round($product->rating))
+                                                <i class="fa fa-star"></i>
+                                            @else
+                                                <i class="fa fa-star-o"></i>
+                                            @endif
+                                        @endfor
+                                        <div class="ms-2">
+                                            {{ $product->reviews->count() }}
+                                        </div>
+
+                                    </div>
                                 </div>
                         </div>
                         <div class="col-md-2 mt-4">

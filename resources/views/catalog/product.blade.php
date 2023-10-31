@@ -56,9 +56,17 @@
                     <div>
                         <h3>{{ $product->detail }}</h3>
                     </div>
-
-                    <div>
-                        <p>Rating</p>
+                    <div class="product-rating d-flex align-items-center">
+                        @for ($i = 0; $i < 5; $i++)
+                            @if ($i < round($product->averageRating))
+                                <i class="fa fa-star"></i>
+                            @else
+                                <i class="fa fa-star-o"></i>
+                            @endif
+                        @endfor
+                        <div class="ms-2">
+                            {{ $product->reviews->count() }}
+                        </div>
                     </div>
 
                     <div class="card">
@@ -130,10 +138,10 @@
 
                 <div class="row">
                     <div class="col d-flex flex-column justify-content-center align-items-center">
-                        <p class="display-1">{{ $product->averageRating() }}</p>
+                        <p class="display-1">{{ $product->averageRating }}</p>
                         <div class="product-rating">
                             @for ($i = 0; $i < 5; $i++)
-                                @if ($i < round($product->averageRating()))
+                                @if ($i < round($product->averageRating))
                                     <i class="fa fa-star"></i>
                                 @else
                                     <i class="fa fa-star-o"></i>
@@ -147,7 +155,7 @@
                         <div class="bd-example-snippet bd-code-snippet">
                             <div class="bd-example m-0 border-0">
                                 <div class="row">
-                                    @foreach ($ratings as $rating)
+                                    @foreach ($product->RatingPercentage as $rating)
                                         <div class="col-2">
                                             <label>{{ $rating['name'] }}</label>
                                         </div>
@@ -171,14 +179,14 @@
                 <hr>
 
                 <div>
-                    <form action="">
+                    <form method="get" action="{{ route('catalog.product', ['category' => $category, 'product' => $product->slug]) }}">
                         <div class="d-flex">
                             <input name="search" type="search" class="form-control" placeholder="Поиск..." aria-label="Поиск" value="">
-                            <button type="submit" class="btn btn-primary">Поиск</button>
+
                             <select class="form-select" id="sorting-select" name="sorting">
                                 <option value="">-- Выберите сортировку --</option>
-                                <option value="">По дате</option>
-                                <option value="">По рейтингу</option>
+                                <option value="sortingDate">По дате</option>
+                                <option value="sortingRating">По рейтингу</option>
                                 <option value="">По популярности</option>
                                 <option value="">По дате изменения</option>
                             </select>
@@ -186,37 +194,37 @@
 
                         <div class="d-flex mt-4">
                             <div class="form-check ms-4">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_5" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_4" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     </i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_3" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_2" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_1" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i>
                                 </label>
                             </div>
                         </div>
-
+                        <button type="submit" class="btn btn-primary">Поиск</button>
                     </form>
                 </div>
                 <hr>
@@ -224,7 +232,7 @@
                 <div class="card-body">
                     @foreach ($product->reviews as $review)
                         <div class="d-flex justify-content-between">
-                            <p>{{ $review->user->name }}</p>
+                            <p><i class="fa fa-user-o" aria-hidden="true"></i> {{ $review->user->name }}</p>
                             <p>{{ $review->created_at }}
                         </div>
                         <div class="product-rating">
@@ -251,7 +259,9 @@
                         <hr>
                     @endforeach
                 </div>
-
+                <div class="col d-flex flex-column justify-content-center align-items-center">
+                    {{ $product->reviews->withQueryString()->links('vendor.pagination.simple-bootstrap-5') }}
+                </div>
             </div>
         </div>
     </div>

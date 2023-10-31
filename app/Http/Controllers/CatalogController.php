@@ -12,8 +12,7 @@ class CatalogController extends Controller
 {
     public function __construct(
         private RatingService $ratingService,
-    )
-    {
+    ) {
         $this->ratingService = $ratingService;
     }
     public function catalog() : View
@@ -22,21 +21,32 @@ class CatalogController extends Controller
         return view('catalog.catalog', ['categories' => $categories]);
     }
 
-    public function category($category) : View
+    public function category(string $category) : View
     {
         $category = Category::where('slug', $category)->first();
-        // $categories = Category::find($category->category_id);
+        $products = $category->products;
+        $products = $products->map(function ($product) {
+            $product->rating = $product->averageRating();
+            return $product;
+        });
+
+        // dd($products);
+
         return view('catalog.categories', ['category' => $category]);
     }
 
-    public function product($category, $product) : View
+    public function product(string $category, string $product, Request $request) : View
     {
-        $product = Product::where('slug', $product)->first();
-        // $product = Product::find($product->id);
+        dump($request);
+        $product = Product::with(['category', 'reviews.user'])->where('slug', $product)->first();
+
         $product->characteristics = $product->characteristics->groupBy('group_id');
-        $ratings = $this->ratingService->calculateRatingPercentage($product);
+        $product->averageRating = $product->averageRating();
+        $product->RatingPercentage = $this->ratingService->calculateRatingPercentage($product);
+
+        $product->reviews = $product->reviews()->paginate(5);
 
 
-        return view('catalog.product', ['product'=> $product, 'category' => $category, 'ratings' => $ratings]);
+        return view('catalog.product', ['product'=> $product, 'category' => $category,]);
     }
 }
