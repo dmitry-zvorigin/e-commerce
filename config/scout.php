@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\Review;
+use App\Models\User;
+
 return [
 
     /*
@@ -133,8 +136,31 @@ return [
         'host' => env('MEILISEARCH_HOST', 'http://localhost:7700'),
         'key' => env('MEILISEARCH_KEY'),
         'index-settings' => [
-            'users' => [
-                'filterableAttributes'=> ['id', 'name', 'email'],
+            // User::class => [
+            //     'filterableAttributes'=> [
+            //         'id',
+            //         'name',
+            //         'email'
+            //     ],
+            // ],
+            Review::class => [
+                'filterableAttributes' => [
+                    'product_id',
+                    'rating',
+                ],
+                'searchableAttributes' => [
+                    'dignities',
+                    'disadvantages',
+                    'comment',
+                ],
+                'sortableAttributes' => [
+                    'rating',
+                    'updated_at',
+                ],
+                'rankingRules' => [
+                    'sort',
+                    'words',
+                ],
             ],
         ],
     ],

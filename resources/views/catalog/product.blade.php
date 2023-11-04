@@ -194,31 +194,32 @@
 
                         <div class="d-flex mt-4">
                             <div class="form-check ms-4">
-                                <input name="rating_5" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                {{-- <input name="rating_5" class="form-check-input" type="checkbox" value="" id="flexCheckChecked"> --}}
+                                <input name="rating_5" class="form-check-input" type="checkbox" value="5" id="flexCheckChecked5">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input name="rating_4" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_4" class="form-check-input" type="checkbox" value="4" id="flexCheckChecked4">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     </i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input name="rating_3" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_3" class="form-check-input" type="checkbox" value="3" id="flexCheckChecked3">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input name="rating_2" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_2" class="form-check-input" type="checkbox" value="2" id="flexCheckChecked2">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i><i class="fa fa-star"></i>
                                 </label>
                             </div>
                             <div class="form-check ms-4">
-                                <input name="rating_1" class="form-check-input" type="checkbox" value="" id="flexCheckChecked">
+                                <input name="rating_1" class="form-check-input" type="checkbox" value="1" id="flexCheckChecked1">
                                 <label class="form-check-label" for="flexCheckChecked">
                                     <i class="fa fa-star"></i>
                                 </label>
