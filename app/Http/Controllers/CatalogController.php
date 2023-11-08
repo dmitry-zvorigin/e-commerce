@@ -47,34 +47,54 @@ class CatalogController extends Controller
         $product->averageRating = $product->averageRating();
         $product->RatingPercentage = $this->ratingService->calculateRatingPercentage($product);
 
+        // $sort = [
+        //     "sortingDate" => '',
+        //     "sortingRating" => '',
+        //     "sortingPopular" => '',
+        //     "sortingEdit" => ''
+        // ];
+        if ($request->hasAny(['search', 'sorting', 'ratings'])) {
 
-        if ($query = $request->get('search')) {
-            $product->reviews = Review::search('их нет', function ($meilsearch, string $query, array $options) use ($product) {
+            $query = $request->input('search', '');
+
+            $product->reviews = Review::search($query, function ($meilsearch, string $query, array $options) use ($product, $request) {
                 $options['filter'] = 'product_id=' . $product->id;
-                // $options['sort'] = ['rating:desc'];
+
+
+                if ($request->filled('ratings')) {
+                    $ratings = $request->input('ratings');
+                    $options['filter'] .= ' AND (' . implode(' OR ', array_map(function ($rating) {
+                        return 'rating=' . $rating;
+                    }, $ratings)) . ')';
+                }
+
+                if ($request->filled('sorting')) {
+                    $sorting = $request->input('sorting');
+                    switch ($sorting) {
+                        case 'sortingDate':
+                            $options['sort'] = ['created_at:asc'];
+                            break;
+                        case 'sortingRating':
+                            $options['sort'] = ['rating:desc'];
+                            break;
+                        case 'sortingPopularity':
+                            $options['sort'] = ['likes:desc'];
+                            break;
+                        case 'sortingEdit':
+                            $options['sort'] = ['updated_at:asc'];
+                            break;
+                    }
+                    // $options['sort'] = ['rating:desc'];
+                }
+
+
 
                 return $meilsearch->search($query, $options);
-            })->orderBy('rating', 'asc')
-            ->paginate(5);
+            })->paginate(5);
 
-            dump($product->reviews);
         } else {
             $product->reviews = $product->reviews()->paginate(5);
         }
-
-        // if ($query = $request->get('search')) {
-        //     $product->reviews = Review::search($query, function($meilsearch, $query, $options) use ($product) {
-        //         $options['filter'] = 'product_id='.$product->id;
-        //         $options['sort'] = ['rating:asc'];
-        //         return $meilsearch->search($query, $options);
-        //     })
-        //         ->where('product_id', $product->id)
-        //         ->paginate(5);
-        // } else {
-        //     $product->reviews = $product->reviews()->paginate(5);
-        // }
-
-
 
         // if ($request->has('search')) {
         //     $search = $request->input('search');

@@ -155,6 +155,8 @@ return [
                 ],
                 'sortableAttributes' => [
                     'rating',
+                    'likes',
+                    'created_at',
                     'updated_at',
                 ],
                 'rankingRules' => [

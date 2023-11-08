@@ -61,6 +61,11 @@ class Product extends Model
         return number_format($this->reviews()->avg('rating'), 2);
     }
 
+    public function reviewCount() : int
+    {
+        return $this->reviews()->count();
+    }
+
     // public function scopeFilter($query, array $filters) : Builder
     // {
     //     if (isset($filters['category'])) {

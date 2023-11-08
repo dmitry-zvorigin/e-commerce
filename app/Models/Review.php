@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 use Meilisearch\Endpoints\Indexes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Carbon\Carbon;
 
 class Review extends Model
 {
@@ -25,19 +27,35 @@ class Review extends Model
     protected $casts = [
         'real_buy' => 'boolean',
         'publish' => 'boolean',
-
     ];
 
 
-    public function user()
+    public function user() : BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function product()
+    public function product() : BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
+
+    public function getCreatedAtAttribute($value) : string
+    {
+        return Carbon::parse($value)->format('H:i:s d-m-Y');
+    }
+
+    public function getUpdatedAtAttribute($value) : string
+    {
+        return Carbon::parse($value)->format('H:i:s d-m-Y');
+    }
+
+    // protected function serializeDate(DateTimeInterface $data) : string
+    // {
+    //     return $data->created_at->format('Y-m-d');
+    // }
+
+
     // public function toSearchableArray() : array
     // {
     //     return [
@@ -72,7 +90,7 @@ class Review extends Model
     // }
 
     protected function makeAllSearchableUsing(Builder $query): Builder
-{
-    return $query->with('user');
-}
+    {
+        return $query->with('user');
+    }
 }
