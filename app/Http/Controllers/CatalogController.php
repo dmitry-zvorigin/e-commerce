@@ -43,6 +43,8 @@ class CatalogController extends Controller
 
         // $product = Product::with(['category', 'reviews.user'])->where('slug', $product)->first();
         $product = Product::whereSlug($product)->with(['category', 'reviews.user'])->firstOrFail();
+
+
         $product->characteristics = $product->characteristics->groupBy('group_id');
         $product->averageRating = $product->averageRating();
         $product->RatingPercentage = $this->ratingService->calculateRatingPercentage($product);
@@ -106,7 +108,7 @@ class CatalogController extends Controller
 
         // dump($product->reviews);
 
-
+        
         return view('catalog.product', ['product'=> $product, 'category' => $category,]);
     }
 }

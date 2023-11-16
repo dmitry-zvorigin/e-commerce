@@ -245,20 +245,40 @@
                                 @endif
                             @endfor
                         </div>
-                        <h4>Достоинства</h4>
-                        <p>{{ $review->dignities }}</p>
-                        <h4>Недостатки</h4>
-                        <p>{{ $review->disadvantages }}</p>
-                        <h4>Комментарий</h4>
-                        <p>{{ $review->comment }}</p>
-                        <h4>Фотографии</h4>
-                        <div class="d-flex justify-content-end">
-                            <i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>
-                            <h4 class="ms-4">{{ $review->likes - $review->dislikes }}</h4>
-                            <i class="fa fa-thumbs-o-down ms-4 fa-2x" aria-hidden="true"></i>
-                        </div>
+
+                        @if (!empty($review->dignities))
+                            <h4>Достоинства</h4>
+                            <p>{{ $review->dignities }}</p>
+                        @endif
+
+                        @if (!empty($review->disadvantages))
+                            <h4>Недостатки</h4>
+                            <p>{{ $review->disadvantages }}</p>
+                        @endif
+
+                        @if (!empty($review->comment))
+                            <h4>Комментарий</h4>
+                            <p>{{ $review->comment }}</p>
+                        @endif
+
+                        {{-- TODO --}}
+                        {{-- @if (!empty($review->dignities))
+                            <h4>Фотографии</h4>
+                            <div class="d-flex justify-content-end">
+                                <i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>
+                                <h4 class="ms-4">{{ $review->likes - $review->dislikes }}</h4>
+                                <i class="fa fa-thumbs-o-down ms-4 fa-2x" aria-hidden="true"></i>
+                            </div>
+                        @endif --}}
+
+                        <a href="{{ route('review.comment.create', ['review' => $review]) }}" class="btn btn-primary">Ответить</a>
+                        @foreach($review->comments as $comment)
+                            @include('review_comment.comments', ['comment' => $comment])
+                        @endforeach
+                        
                         <hr>
                     @endforeach
+
                 </div>
                 <div class="col d-flex flex-column justify-content-center align-items-center">
                     {{ $product->reviews->withQueryString()->links('vendor.pagination.simple-bootstrap-5') }}

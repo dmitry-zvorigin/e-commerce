@@ -9,6 +9,7 @@ use Laravel\Scout\Searchable;
 use Meilisearch\Endpoints\Indexes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Review extends Model
 {
@@ -38,6 +39,11 @@ class Review extends Model
     public function product() : BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function comments() : HasMany
+    {
+        return $this->hasMany(ReviewComment::class);
     }
 
     public function getCreatedAtAttribute($value) : string

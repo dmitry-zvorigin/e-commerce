@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewsController;
 use App\Http\Controllers\Test;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WishController;
@@ -31,8 +32,14 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/cart', [CartController::class,'index'])->name('cart');
 Route::get('/wishlist', [WishController::class,'index'])->name('wishlist');
 
-Route::get('/rewiew/{product}/create', [ProductController::class, 'createReview'])->name('review.create');
-Route::post('/rewiew/{product}/store', [ProductController::class,'storeReview'])->name('review.store');
+Route::get('/review/{product}/create', [ReviewsController::class, 'createReview'])->name('review.create');
+Route::post('/review/{product}/store', [ReviewsController::class,'storeReview'])->name('review.store');
+
+Route::get('/review/comment/{review}/create', [ReviewsController::class,'createComment'])->name('review.comment.create');
+Route::post('/review/comment/{review}/store', [ReviewsController::class,'storeComment'])->name('review.comment.store');
+
+Route::get('/review/comment_append/{comment}/create', [ReviewsController::class,'createCommentAppend'])->name('review.comment.append.create');
+Route::post('/review/comment_append/{comment}/store', [ReviewsController::class,'storeCommentAppend'])->name('review.comment.append.store');
 
 Route::group(['prefix' => 'catalog'], function () {
     Route::get('/', [CatalogController::class,'catalog'])->name('catalog');

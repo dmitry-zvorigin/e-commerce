@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('product_id');
-            $table->string('dignities');
-            $table->string('disadvantages');
-            $table->string('comment');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+            $table->text('dignities')->nullable();
+            $table->text('disadvantages')->nullable();
+            $table->text('comment')->nullable();
             $table->boolean('real_buy')->default(true);
             $table->float('rating', 2, 1);
             $table->integer('likes')->default(0);
@@ -25,8 +25,12 @@ return new class extends Migration
             $table->boolean('publish')->default(true);
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+
+            // $table->unsignedBigInteger('user_id');
+            // $table->unsignedBigInteger('product_id');
+
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
