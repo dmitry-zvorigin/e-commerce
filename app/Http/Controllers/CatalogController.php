@@ -31,37 +31,23 @@ class CatalogController extends Controller
             return $product;
         });
 
-        // dd($products);
-
         return view('catalog.categories', ['category' => $category]);
     }
 
     public function product(string $category, string $product, Request $request) : View
     {
-        // dump($request);
-
-
-        // $product = Product::with(['category', 'reviews.user'])->where('slug', $product)->first();
-        $product = Product::whereSlug($product)->with(['category', 'reviews.user'])->firstOrFail();
-
+        $product = Product::whereSlug($product)->with(['category', 'reviews.user', 'reviews.comments'])->firstOrFail();
 
         $product->characteristics = $product->characteristics->groupBy('group_id');
         $product->averageRating = $product->averageRating();
         $product->RatingPercentage = $this->ratingService->calculateRatingPercentage($product);
 
-        // $sort = [
-        //     "sortingDate" => '',
-        //     "sortingRating" => '',
-        //     "sortingPopular" => '',
-        //     "sortingEdit" => ''
-        // ];
         if ($request->hasAny(['search', 'sorting', 'ratings'])) {
 
             $query = $request->input('search', '');
 
             $product->reviews = Review::search($query, function ($meilsearch, string $query, array $options) use ($product, $request) {
                 $options['filter'] = 'product_id=' . $product->id;
-
 
                 if ($request->filled('ratings')) {
                     $ratings = $request->input('ratings');
@@ -86,10 +72,7 @@ class CatalogController extends Controller
                             $options['sort'] = ['updated_at:asc'];
                             break;
                     }
-                    // $options['sort'] = ['rating:desc'];
                 }
-
-
 
                 return $meilsearch->search($query, $options);
             })->paginate(5);
@@ -97,17 +80,6 @@ class CatalogController extends Controller
         } else {
             $product->reviews = $product->reviews()->paginate(5);
         }
-
-        // if ($request->has('search')) {
-        //     $search = $request->input('search');
-
-        //     $product->reviews = Review::search($search)->where('product_id', $product->id)->paginate(5);
-        // } else {
-        //     $product->reviews = $product->reviews()->paginate(5);
-        // }
-
-        // dump($product->reviews);
-
         
         return view('catalog.product', ['product'=> $product, 'category' => $category,]);
     }

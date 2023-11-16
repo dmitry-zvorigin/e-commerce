@@ -8,7 +8,7 @@
     <div>
         <h1>Создать комментарий к комментарию {{ $comment->user->name }}</h1>
 
-        <form action="{{ route('review.comment.append.store', ['comment' => $comment]) }}" method="post">
+        <form action="{{ route('review.comment.reply.store', ['review' => $review, 'comment' => $comment]) }}" method="post">
             @csrf
             <div class="form-group mb-4">
                 <label for="comment">Комментарий:</label>

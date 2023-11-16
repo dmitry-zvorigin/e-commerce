@@ -66,24 +66,27 @@ class ReviewsController extends Controller
         return redirect()->back()->with('success','Комментарий успешно добавлен');
     }
 
-    public function createCommentAppend (ReviewComment $comment) : View
+    public function createReplyComment (Review $review, ReviewComment $comment) : View
     {
         
-        return view('review_comment.create_append', ['comment' => $comment]);
+        return view('review_comment.create_append', ['comment' => $comment, 'review' => $review]);
     }
 
-    public function storeCommentAppend(Request $request, ReviewComment $comment) : RedirectResponse
+    public function storeReplyComment(Request $request, Review $review, ReviewComment $comment) : RedirectResponse
     {
         $request->validate([
             'comment' => 'required|string',
         ]);
 
-        $comment_append = new ReviewCommentAppend([
+        $comment_append = new ReviewComment([
             'content' => $request->input('comment'),
         ]);
 
         $comment_append->user()->associate(auth()->user());
-        $comment->commentAppend()->save($comment_append);
+        $comment_append->commentParent()->associate($comment);
+        $comment_append->review()->associate($review);
+
+        $comment_append->save();
 
         return redirect()->back()->with('success','Комментарий успешно добавлен');
     }

@@ -262,18 +262,65 @@
                         @endif
 
                         {{-- TODO --}}
-                        {{-- @if (!empty($review->dignities))
+                        @if (!empty($review->dignities))
                             <h4>Фотографии</h4>
-                            <div class="d-flex justify-content-end">
-                                <i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>
-                                <h4 class="ms-4">{{ $review->likes - $review->dislikes }}</h4>
-                                <i class="fa fa-thumbs-o-down ms-4 fa-2x" aria-hidden="true"></i>
-                            </div>
-                        @endif --}}
+                        @endif
+                        <div class="d-flex justify-content-end">
+                            <i class="fa fa-thumbs-o-up fa-2x" aria-hidden="true"></i>
+                            <h4 class="ms-4">{{ $review->likes - $review->dislikes }}</h4>
+                            <i class="fa fa-thumbs-o-down ms-4 fa-2x" aria-hidden="true"></i>
+                        </div>
 
-                        <a href="{{ route('review.comment.create', ['review' => $review]) }}" class="btn btn-primary">Ответить</a>
-                        @foreach($review->comments as $comment)
-                            @include('review_comment.comments', ['comment' => $comment])
+
+                        <div class="d-flex flex-column">
+                            <form action="{{ route('review.comment.store', ['review' => $review]) }}" method="post" class="d-flex flex-column">
+                                @csrf
+                                <div class="d-flex justify-content-end">
+                                    <textarea class="form-control mb-2" name="comment" id="comment" rows="2" style="width: 50%;" placeholder="Написать комментарий...">{{ old('comment') }}</textarea>
+                                </div>
+                                @error('comment')
+                                    <p><span class="text-danger">{{ $message }}</span></p>
+                                @enderror
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">Ответить</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {{-- <a href="{{ route('review.comment.create', ['review' => $review]) }}" class="btn btn-primary">Ответить</a> --}}
+
+                        @foreach ($review->comments()->whereNull('parent_comment_id')->get() as $comment) 
+                            <div class="comment ms-4">
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <p><i class="fa fa-user-o" aria-hidden="true"></i> {{ $comment->user->name }}</p>
+                                    <p>{{ $comment->created_at }}
+                                </div>
+                                <p>Кому: {{ $comment->review->user->name }}</p>
+                                <p>{{ $comment->content }}</p>
+                                {{-- <a href="{{ route('review.comment.reply.create', ['review' => $comment->review, 'comment' => $comment]) }}" class="btn btn-primary">Ответить</a> --}}
+                                
+                                <div class="d-flex flex-column">
+                                    <form action="{{ route('review.comment.reply.store', ['review' => $comment->review, 'comment' => $comment]) }}" method="post" class="d-flex flex-column">
+                                        @csrf
+                                        <div class="d-flex justify-content-end">
+                                            <textarea class="form-control mb-2" name="comment" id="comment" rows="2" style="width: 50%;" placeholder="Написать комментарий...">{{ old('comment') }}</textarea>
+                                        </div>
+                                        @error('comment')
+                                            <p><span class="text-danger">{{ $message }}</span></p>
+                                        @enderror
+                                        <div class="d-flex justify-content-end">
+                                            <button type="submit" class="btn btn-primary">Ответить</button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                @if($comment->commentsChildren->count() > 0)
+                                    @include('review_comment.comments', ['comments' => $comment->commentsChildren])
+                                @endif
+                            </div>
+                            
+
                         @endforeach
                         
                         <hr>

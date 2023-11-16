@@ -14,6 +14,7 @@ class ReviewComment extends Model
     protected $fillable = [
         'user_id',
         'review_id',
+        'parent_comment_id',
         'content',
     ];
 
@@ -31,13 +32,15 @@ class ReviewComment extends Model
         return $this->belongsTo(Review::class);
     }
 
-    public function commentsAppend() : HasMany
+    public function commentParent() : BelongsTo
     {
-        return $this->hasMany(ReviewCommentAppend::class, 'review_comment_id');
+        return $this->belongsTo(ReviewComment::class, 'parent_comment_id');
     }
 
-    public function parentComment() : BelongsTo
+    public function commentsChildren() : HasMany
     {
-        return $this->belongsTo(ReviewComment::class, 'review_id');
+        return $this->hasMany(ReviewComment::class, 'parent_comment_id');
     }
+
+
 }
