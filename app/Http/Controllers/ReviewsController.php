@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Gallery_review;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\ReviewComment;
@@ -9,6 +10,7 @@ use App\Models\ReviewCommentAppend;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
+use Image;
 
 class ReviewsController extends Controller
 {
@@ -39,7 +41,30 @@ class ReviewsController extends Controller
 
         $review->user()->associate(auth()->user());
         $review->product()->associate($product);
+
         $review->save();
+
+        if($request->hasFile('images')) {
+            foreach ($request->file('images') as $image) {
+                $galleryReview = new Gallery_review();
+                $galleryReview->reviews_id = $review->id;
+                $imageName = $image->hashName();
+
+                $image->storeAs('gallery_reviews/images', $imageName);
+
+                $thumbnail = Image::make(storage_path('app/gallery_reviews/images/'. $imageName));
+                $thumbnail->resize(200, 200);
+                $thumbnailName = 'thumb_' . $imageName;
+                $thumbnail->save(storage_path('app/gallery_reviews/thumbnails/' . $thumbnailName));
+
+                $galleryReview->image = $imageName;
+                $galleryReview->thumbnail = $thumbnailName;
+
+                $galleryReview->save();
+            }
+        }
+
+        
 
         return redirect()->route('catalog.product', ['category' => $product->category->slug,'product' => $product->slug])->with('success', 'Отзыв успешно создан');
     }

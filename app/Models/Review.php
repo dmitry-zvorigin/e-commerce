@@ -46,6 +46,11 @@ class Review extends Model
         return $this->hasMany(ReviewComment::class);
     }
 
+    public function images() : HasMany
+    {
+        return $this->hasMany(Gallery_review::class, 'reviews_id');
+    }
+
     public function getCreatedAtAttribute($value) : string
     {
         return Carbon::parse($value)->format('H:i:s d-m-Y');
