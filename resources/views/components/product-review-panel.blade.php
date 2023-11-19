@@ -40,4 +40,16 @@
             <a class="btn btn-warning" href="{{ route('review.create', ['product' => $product->slug]) }}">Написать отзыв</a>
         </div>
     </div>
+    <div class="row justify-content-center mb-4">
+        <div class="text-center">
+            @foreach ($product->galleryReviewsAll->take(5) as $image)
+                <img 
+                    class="main-img bd-placeholder-img img-thumbnails" 
+                    src="{{ asset('gallery_reviews/thumbnails/' . $image->thumbnail) }}" 
+                    alt="Описание изображения" width="150" height="150"
+                >
+            @endforeach
+            <a href="#" class="link-secondary link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover">Показать все {{ $product->galleryReviewsAll->count() }}</a>
+        </div>
+    </div>
 </div>

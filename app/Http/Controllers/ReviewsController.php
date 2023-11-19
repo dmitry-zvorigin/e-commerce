@@ -47,7 +47,7 @@ class ReviewsController extends Controller
         if($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $galleryReview = new Gallery_review();
-                $galleryReview->reviews_id = $review->id;
+                $galleryReview->review_id = $review->id;
                 $imageName = $image->hashName();
 
                 $image->storeAs('gallery_reviews/images', $imageName);
@@ -91,13 +91,12 @@ class ReviewsController extends Controller
         return redirect()->back()->with('success','Комментарий успешно добавлен');
     }
 
-    public function createReplyComment (Review $review, ReviewComment $comment) : View
+    public function createAppendComment (Review $review, ReviewComment $commentAppend) : View
     {
-        
-        return view('review_comment.create_append', ['comment' => $comment, 'review' => $review]);
+        return view();
     }
 
-    public function storeReplyComment(Request $request, Review $review, ReviewComment $comment) : RedirectResponse
+    public function storeAppendComment (Request $request, Review $review, ReviewComment $comment) : RedirectResponse
     {
         $request->validate([
             'comment' => 'required|string',
@@ -114,5 +113,60 @@ class ReviewsController extends Controller
         $comment_append->save();
 
         return redirect()->back()->with('success','Комментарий успешно добавлен');
+        
+    }
+
+    public function createReplyComment (Review $review, ReviewComment $comment) : View
+    {
+        
+        return view('review_comment.create_append', ['comment' => $comment, 'review' => $review]);
+    }
+
+    public function storeReplyComment(Request $request) : RedirectResponse
+    {
+        $request->validate([
+            'comment' => 'required|string',
+            'reply_comment_id' => 'required|integer|exists:review_comments,id',
+            'parent_comment_id' => 'required|integer|exists:review_comments,parent_comment_id',
+            'review_id' => 'required|integer|exists:reviews,id'
+        ]);
+
+        $comment_append = new ReviewComment([
+            'content' => $request->input('comment'),
+        ]);
+
+        $comment_append->user()->associate(auth()->user());
+
+        $parentComment = ReviewComment::find($request->input('parent_comment_id'));
+        $comment_append->commentParent()->associate($parentComment);
+
+        $review_id = Review::find($request->input('review_id'));
+        $comment_append->review()->associate($review_id);
+
+        $replyComment = ReviewComment::find($request->input('reply_comment_id'));
+        $comment_append->commentReply()->associate($replyComment);
+
+        $comment_append->save();
+
+        return redirect()->back()->with('success','Комментарий успешно добавлен');
+    }
+
+
+
+    public function loadComments(Review $review) : View
+    {
+        $comments = $review->comments()->whereNull('parent_comment_id')->get();
+
+        return view('review_comment.partial', ['comments' => $comments, 'review' => $review]);
+    }
+
+    public function loadCommentsChild(ReviewComment $commentParent) : View
+    {
+        // try {
+            $comments = $commentParent->commentsChildren()->get();
+            return view('review_comment.partial_child', ['comments' => $comments, 'commentParent' => $commentParent]);
+        // } catch (\Exception $e) {
+        //     dd($e->getMessage());
+        // }
     }
 }

@@ -48,7 +48,7 @@ class Review extends Model
 
     public function images() : HasMany
     {
-        return $this->hasMany(Gallery_review::class, 'reviews_id');
+        return $this->hasMany(Gallery_review::class, 'review_id');
     }
 
     public function getCreatedAtAttribute($value) : string

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Laravel\Scout\Searchable;
 
 class Product extends Model
@@ -56,58 +57,23 @@ class Product extends Model
         return $this->hasMany(Gallery_product::class);
     }
 
+    // Подсчет среднего значения, на основе оценок
     public function averageRating() : string
     {
         return number_format($this->reviews()->avg('rating'), 2);
     }
 
+    // Подсчет колличества отзывов для продукта
     public function reviewCount() : int
     {
         return $this->reviews()->count();
     }
 
-    // public function scopeFilter($query, array $filters) : Builder
-    // {
-    //     if (isset($filters['category'])) {
-    //         $query->where('category_id', $filters['category']);
-    //     }
-
-    //     if (isset($filters['min_price']) && isset($filters['max_price'])) {
-    //         $query->whereBetween('price', [$filters['min_price'], $filters['max_price']]);
-    //     }
-
-    //     if (isset($filters['color'])) {
-    //         $query->where('color', $filters['color']);
-    //     }
-
-    //     if (isset($filters['page'])) {
-    //         $query->paginate(10, ['*'], 'page', $filters['page']);
-    //     }
-
-    //     // Добавьте другие фильтры, если необходимо
-    //     return $query;
-    // }
-
-    // public function scopeSorting($query, $sorting) : Builder
-    // {
-
-    //     if (isset($sorting)) {
-    //         $sortOptions = [
-    //             'price_asc' => ['price', 'asc'],
-    //             'price_desc' => ['price', 'desc'],
-    //             'name_asc' => ['name', 'asc'],
-    //             'name_desc' => ['name', 'desc'],
-    //             'created_at_asc' => ['updated_at', 'asc'],
-    //             'created_at_desc' => ['updated_at', 'desc'],
-    //         ];
-
-    //         if (array_key_exists($sorting, $sortOptions)) {
-    //             $query->orderBy($sortOptions[$sorting][0], $sortOptions[$sorting][1]);
-    //         }
-    //     }
-
-    //     return $query;
-    // }
+    // Получаем все изображения из отзывов
+    public function galleryReviewsAll() : HasManyThrough
+    {
+        return $this->hasManyThrough(Gallery_review::class, Review::class, 'product_id', 'review_id');
+    }
 
     // Мутатор для времени
     public function getCreatedAtAttribute($value) : string

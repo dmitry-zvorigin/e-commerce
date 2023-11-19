@@ -13,12 +13,11 @@ return new class extends Migration
     {
         Schema::create('gallery_reviews', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('reviews_id');
+            $table->foreignId('review_id')->constrained('reviews')->cascadeOnDelete();
             $table->string('image');
             $table->string('thumbnail');
             $table->timestamps();
 
-            $table->foreign('reviews_id')->references('id')->on('reviews')->onDelete('cascade');
         });
     }
 
