@@ -20,6 +20,7 @@ class ReviewsController extends Controller
         return view('review.create', ['product' => $product]);
     }
 
+    // Создаем отзыв
     public function storeReview(Request $request, Product $product) : RedirectResponse
     {
         // dd($product);
@@ -75,6 +76,7 @@ class ReviewsController extends Controller
         return view('review_comment.create', ['review' => $review]);
     }
 
+    // Создаем комментарий к отзыву (Верхний уровень)
     public function storeComment(Request $request, Review $review) : RedirectResponse
     {
         $request->validate([
@@ -96,10 +98,13 @@ class ReviewsController extends Controller
         return view();
     }
 
-    public function storeAppendComment (Request $request, Review $review, ReviewComment $comment) : RedirectResponse
+    // Создаем Ответ на комментарий
+    public function storeAppendComment (Request $request) : RedirectResponse
     {
         $request->validate([
             'comment' => 'required|string',
+            'review_id' => 'required|integer|exists:reviews,id',
+            'parent_comment_id' => 'required|integer|exists:review_comments,id',
         ]);
 
         $comment_append = new ReviewComment([
@@ -107,8 +112,12 @@ class ReviewsController extends Controller
         ]);
 
         $comment_append->user()->associate(auth()->user());
-        $comment_append->commentParent()->associate($comment);
-        $comment_append->review()->associate($review);
+
+        $parentComment = ReviewComment::find($request->input('parent_comment_id'));
+        $comment_append->commentParent()->associate($parentComment);
+
+        $review_id = Review::find($request->input('review_id'));        
+        $comment_append->review()->associate($review_id);
 
         $comment_append->save();
 
@@ -118,10 +127,10 @@ class ReviewsController extends Controller
 
     public function createReplyComment (Review $review, ReviewComment $comment) : View
     {
-        
         return view('review_comment.create_append', ['comment' => $comment, 'review' => $review]);
     }
 
+    // Создаем ответ на ответ 
     public function storeReplyComment(Request $request) : RedirectResponse
     {
         $request->validate([
@@ -153,6 +162,7 @@ class ReviewsController extends Controller
 
 
 
+    // Подгружаем комментарии у отзывов
     public function loadComments(Review $review) : View
     {
         $comments = $review->comments()->whereNull('parent_comment_id')->get();
@@ -160,6 +170,7 @@ class ReviewsController extends Controller
         return view('review_comment.partial', ['comments' => $comments, 'review' => $review]);
     }
 
+    // Подгружаем ответы у комментариев
     public function loadCommentsChild(ReviewComment $commentParent) : View
     {
         // try {

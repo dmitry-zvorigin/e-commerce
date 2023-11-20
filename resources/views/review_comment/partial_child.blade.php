@@ -1,6 +1,8 @@
 <div class="d-flex flex-column mb-4">
-    <form action="{{ route('review.comment.append.store', ['review' => $commentParent->review_id, 'comment' => $commentParent]) }}" method="post" class="d-flex flex-column">
+    <form action="{{ route('review.comment.append.store') }}" method="post" class="d-flex flex-column">
         @csrf
+        <input type="hidden" name="review_id" value="{{ $commentParent->review_id}}">
+        <input type="hidden" name="parent_comment_id" value="{{ $commentParent->id }}"> 
         <div class="d-flex justify-content-end">
             <textarea class="form-control mb-2" name="comment" id="comment" rows="2" style="width: 50%;" placeholder="Написать комментарий...">{{ old('comment') }}</textarea>
         </div>

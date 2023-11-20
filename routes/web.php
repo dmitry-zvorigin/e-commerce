@@ -39,11 +39,12 @@ Route::post('/review/{product}/store', [ReviewsController::class,'storeReview'])
 Route::get('/reviews/{review}/comments/create', [ReviewsController::class,'createComment'])->name('review.comment.create');
 Route::post('/reviews/{review}/comments/store', [ReviewsController::class,'storeComment'])->name('review.comment.store');
 
-Route::post('reviews/{review}/commentsAppend/{comment}/store', [ReviewsController::class,'storeAppendComment'])->name('review.comment.append.store');
+// Route::post('reviews/{review}/commentsAppend/{comment}/store', [ReviewsController::class,'storeAppendComment'])->name('review.comment.append.store');
+Route::post('/store-commentsAppend/', [ReviewsController::class, 'storeAppendComment'])->name('review.comment.append.store');
 
 Route::get('/reviews/{review}/commentsReply/{comment}/create', [ReviewsController::class,'createReplyComment'])->name('review.comment.reply.create');
 // Route::post('/reviews/{review}/commentsReply/{comment}/store', [ReviewsController::class,'storeReplyComment'])->name('review.comment.reply.store');
-Route::post('/store-comments/', [ReviewsController::class,'storeReplyComment'])->name('review.comment.reply.store');
+Route::post('/store-commentsReply/', [ReviewsController::class,'storeReplyComment'])->name('review.comment.reply.store');
 
 Route::get('/load-comments/{review}', [ReviewsController::class,'loadComments'])->name('load.comments');
 Route::get('/load-comments-child/{commentParent}', [ReviewsController::class,'loadCommentsChild'])->name('load.comments.child');
