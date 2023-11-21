@@ -1,19 +1,3 @@
-<div class="d-flex flex-column mb-4">
-    <form action="{{ route('review.comment.append.store') }}" method="post" class="d-flex flex-column">
-        @csrf
-        <input type="hidden" name="review_id" value="{{ $commentParent->review_id}}">
-        <input type="hidden" name="parent_comment_id" value="{{ $commentParent->id }}"> 
-        <div class="d-flex justify-content-end">
-            <textarea class="form-control mb-2" name="comment" id="comment" rows="2" style="width: 50%;" placeholder="Написать комментарий...">{{ old('comment') }}</textarea>
-        </div>
-        @error('comment')
-            <p><span class="text-danger">{{ $message }}</span></p>
-        @enderror
-        <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">Ответить</button>
-        </div>
-    </form>
-</div>
 <div class="col mt-4 ms-4 mb-4">
     @foreach ($comments as $comment)
         <div class="col-md-11 mt-4 mx-auto">
@@ -35,7 +19,7 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-center mb-4 me-4">
                     <div class="ms-4">
-
+                        <button type="button" class="load-comment-reply-form-btn btn btn-outline-secondary" data-comment-reply-form-id="{{ $comment->id}}">Ответить</button>
                     </div>
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
@@ -58,24 +42,26 @@
                             </button>
                         </div>
                     </div>
-                </div>    
-                <div class="d-flex flex-column mb-4 me-4">
-                    <form action="{{ route('review.comment.reply.store') }}" method="post" class="d-flex flex-column">
-                        @csrf
-                        <input type="hidden" name="reply_comment_id" value="{{ $comment->id }}">
-                        <input type="hidden" name="review_id" value="{{ $commentParent->review_id}}">
-                        <input type="hidden" name="parent_comment_id" value="{{ $commentParent->id }}"> 
-                        <div class="d-flex justify-content-end">
-                            <textarea class="form-control mb-2" name="comment" id="comment" rows="2" style="width: 50%;" placeholder="Написать ответ...">{{ old('comment') }}</textarea>
-                        </div>
-                        @error('comment')
-                            <p><span class="text-danger">{{ $message }}</span></p>
-                        @enderror
-                        <div class="d-flex justify-content-end">
-                            <button type="submit" class="btn btn-primary">Ответить</button>
-                        </div>
-                    </form>
-                </div>            
+                </div> 
+                <div id="comment_reply_form{{ $comment->id }}" class="" style="display: none">
+                    <div class="d-flex flex-column mb-4 me-4">
+                        <form action="{{ route('review.comment.reply.store') }}" method="post" class="d-flex flex-column">
+                            @csrf
+                            <input type="hidden" name="reply_comment_id" value="{{ $comment->id }}">
+                            <input type="hidden" name="review_id" value="{{ $commentParent->review_id}}">
+                            <input type="hidden" name="parent_comment_id" value="{{ $commentParent->id }}"> 
+                            <div class="d-flex justify-content-end">
+                                <textarea class="form-control mb-2" name="comment" id="comment" rows="2" style="width: 50%;" placeholder="Написать ответ...">{{ old('comment') }}</textarea>
+                            </div>
+                            @error('comment')
+                                <p><span class="text-danger">{{ $message }}</span></p>
+                            @enderror
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary">Ответить</button>
+                            </div>
+                        </form>
+                    </div>  
+                </div>   
             </div>
         </div>
     @endforeach
@@ -84,24 +70,13 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
-        // Обработчик клика на кнопке "Загрузить комментарии"
-        $('.load-comments-child-btn').on('click', function() {
-            const reviewId = $(this).data('comment-id'); // Получаем ID отзыва из кнопки
-            const commentsBlock = $('#comments-block-child' + commentId); // Находим блок комментарев
+        $('.load-comment-reply-form-btn').on('click', function() {
+            const commentId = $(this).data('comment-reply-form-id');
+            const commentForm = $('#comment_reply_form' + commentId);
 
-            // Отправляем AJAX-запрос на сервер для получения комментариев
-            $.ajax({
-                type: 'GET',
-                url: '/load-comments-child/' + commentId, // Маршрут для получения комментариев
-                success: function(response) {
-                    // Добавляем полученные комментарии в блок под отзывом
-                    commentsBlock.html(response);
-                    // $('.comments-block').html(response);
-                },
-                error: function() {
-                    alert('Произошла ошибка при загрузке комментариев');
-                }
-            });
+            $('[id^="comment_reply_form"]').not(commentForm).hide();
+
+            commentForm.toggle();
         });
     });
 </script>

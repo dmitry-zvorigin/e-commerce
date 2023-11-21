@@ -6,7 +6,6 @@ use App\Models\Gallery_review;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\ReviewComment;
-use App\Models\ReviewCommentAppend;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
@@ -166,16 +165,20 @@ class ReviewsController extends Controller
     public function loadComments(Review $review) : View
     {
         $comments = $review->comments()->whereNull('parent_comment_id')->get();
+        // $comments = $review->commentsParent();
+        
 
-        return view('review_comment.partial', ['comments' => $comments, 'review' => $review]);
+        return view('components.product-review-comment', ['comments' => $comments, 'review' => $review]);
     }
 
     // Подгружаем ответы у комментариев
     public function loadCommentsChild(ReviewComment $commentParent) : View
     {
         // try {
-            $comments = $commentParent->commentsChildren()->get();
-            return view('review_comment.partial_child', ['comments' => $comments, 'commentParent' => $commentParent]);
+            // dump($commentParent->commentsChildren());
+            $commentsChild = $commentParent->commentsChildren()->get();
+
+            return view('components.product-review-comment-child', ['commentsChild' => $commentsChild, 'commentParent' => $commentParent]);
         // } catch (\Exception $e) {
         //     dd($e->getMessage());
         // }

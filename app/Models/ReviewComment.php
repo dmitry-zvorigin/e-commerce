@@ -37,15 +37,13 @@ class ReviewComment extends Model
         return $this->belongsTo(ReviewComment::class, 'parent_comment_id');
     }
 
-    public function commentsChildren() : HasMany
-    {
-        return $this->hasMany(ReviewComment::class, 'parent_comment_id');
-    }
-
     public function commentReply() : BelongsTo
     {
         return $this->belongsTo(ReviewComment::class,'reply_comment_id');
     }
 
-
+    public function commentsChildren() : HasMany
+    {
+        return $this->hasMany(ReviewComment::class, 'parent_comment_id');
+    }
 }

@@ -61,6 +61,18 @@ class Review extends Model
         return Carbon::parse($value)->format('H:i:s d-m-Y');
     }
 
+    // Получить верхние комментарии на отзыв
+    public function commentsParent() 
+    {
+        return $this->comments()->whereNull('parent_comment_id')->get();
+    }
+
+    // Подсчитываем количество верхних комментариев
+    public function commentsParentCount() : int
+    {
+        return $this->comments()->whereNull('parent_comment_id')->count();
+    }
+
     // protected function serializeDate(DateTimeInterface $data) : string
     // {
     //     return $data->created_at->format('Y-m-d');
