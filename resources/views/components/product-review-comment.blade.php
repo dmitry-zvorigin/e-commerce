@@ -61,51 +61,72 @@
                     </div> 
                 </div>
             </div>
-            <div id="block-comments-child{{ $comment->id }}"  style="display: none"></div>    
+            <div class="block-comments-child-{{ $comment->id }}"  style="display: none"></div>    
         </div>
     @endforeach
 </div>
 
 {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
 <script>
-    $(document).ready(function() {
-        // Обработчик клика на кнопке "Загрузить комментарии"
-        $('.load-comments-child-btn').on('click', function() {
-            const commentParentId = $(this).data('load-comments-parent-id'); // Получаем ID отзыва из кнопки
-            const commentsChildBlock = $('#block-comments-child' + commentParentId); // Находим блок комментарев
+$(document).ready(function() {
+    // Обработчик клика на кнопке "Показать ответы"
+    // $('.product-reviews-container').on('click', '.load-comments-child-btn', function() {
+    //     const commentParentId = $(this).data('load-comments-parent-id');
+    //     const commentsChildBlock = $(`.block-comments-child-${commentParentId}`);
 
-            if (commentsChildBlock.is(':visible')) {
-                commentsChildBlock.hide();
-            } else {
-                if (commentsChildBlock.html().trim() === '') {
-                    $.ajax({
-                        type: 'GET',
-                        url: '/load-comments-child/' + commentParentId, // Маршрут для получения комментариев
-                        success: function(response) {
-                            // Добавляем полученные комментарии в блок под отзывом
-                            commentsChildBlock.html(response).show();
-                        },
-                        error: function() {
-                            alert('Произошла ошибка при загрузке комментариев');
-                        }
-                    });
-                } else {
-                    commentsChildBlock.show();
-                }
-                // Отправляем AJAX-запрос на сервер для получения комментариев
+    //     // Переключаем видимость блока ответов при каждом нажатии на кнопку
+    //     commentsChildBlock.toggle();
 
-            }
-        });
+    //     if (commentsChildBlock.is(':visible')) {
+    //         // Если блок становится видимым, отправляем AJAX-запрос для загрузки комментариев
+    //         $.ajax({
+    //             type: 'GET',
+    //             url: '/load-comments-child/' + commentParentId,
+    //             success: function(response) {
+    //                 commentsChildBlock.html(response);
+    //             },
+    //             error: function() {
+    //                 alert('Произошла ошибка при загрузке комментариев');
+    //             }
+    //         });
+    //     }
+    // });
 
-        // $('.form-comment-parent-btn').on('click', function() {
-        //     const commentId = $(this).data('form-comment-parent-id'); // Получаем ID комментария из кнопки
-        //     const commentsForm = $('#block-comment-parent-form' + commentId); // Находим блок формы
+    // $('.product-reviews-container').on('click', '.load-comments-child-btn', function() {
+    //     const commentParentId = $(this).data('load-comments-parent-id');
+    //     console.log('Comment Parent ID:', commentParentId); // Проверяем, получаем ли мы правильный ID
 
-        //     // Скрываем все другие блоки форм, кроме текущего
-        //     $('[id^="block-comment-parent-form"]').not(commentsForm).hide();
+    //     const commentsChildBlock = $('.block-comments-child-' + commentParentId);
+    //     console.log('Comments Child Block:', commentsChildBlock); // Проверяем, находим ли мы блок комментариев
 
-        //     // Показываем или скрываем текущую форму в зависимости от её текущего состояния
-        //     commentsForm.toggle();
-        // });
-    });
+    //     // Переключаем видимость блока ответов при каждом нажатии на кнопку
+    //     commentsChildBlock.toggle();
+
+    //     if (commentsChildBlock.is(':visible')) {
+    //         // Если блок становится видимым, отправляем AJAX-запрос для загрузки комментариев
+    //         $.ajax({
+    //             type: 'GET',
+    //             url: '/load-comments-child/' + commentParentId,
+    //             success: function(response) {
+    //                 commentsChildBlock.html(response);
+    //             },
+    //             error: function() {
+    //                 alert('Произошла ошибка при загрузке комментариев');
+    //             }
+    //         });
+    //     }
+    // });
+
+    // // Обработчик клика на кнопке "Ответить"
+    // $('.product-reviews-container').on('click', '.form-comment-parent-btn', function() {
+    //     const commentId = $(this).data('form-comment-parent-id');
+    //     const commentsForm = $(`#block-comment-parent-form${commentId}`);
+
+    //     // Скрываем все другие блоки форм, кроме текущего
+    //     $(`[id^="block-comment-parent-form"]`).not(commentsForm).hide();
+
+    //     // Показываем или скрываем текущую форму в зависимости от её текущего состояния
+    //     commentsForm.toggle();
+    // });
+});
 </script>

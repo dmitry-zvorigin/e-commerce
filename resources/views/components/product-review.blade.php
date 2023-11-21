@@ -1,4 +1,4 @@
-<div class="card col mt-4">
+<div class="product-reviews-container card col mt-4">
     @foreach ($reviews as $review)
         <div class="col-md-11 mt-4 mx-auto">
             <div class="card">
@@ -133,5 +133,52 @@
                 });
             }
         });
+
+        $('.product-reviews-container').on('click', '.load-comments-child-btn', function() {
+            const commentParentId = $(this).data('load-comments-parent-id');
+            const commentsChildBlock = $('.block-comments-child-' + commentParentId);
+
+            // Переключаем видимость блока ответов при каждом нажатии на кнопку
+            commentsChildBlock.toggle();
+
+            if (commentsChildBlock.is(':visible')) {
+                // Если блок становится видимым, отправляем AJAX-запрос для загрузки комментариев
+                $.ajax({
+                    type: 'GET',
+                    url: '/load-comments-child/' + commentParentId,
+                    success: function(response) {
+                        commentsChildBlock.html(response);
+                    },
+                    error: function() {
+                        alert('Произошла ошибка при загрузке комментариев');
+                    }
+                });
+            }
+        });
+
+        // Обработчик клика на кнопке "Ответить"
+        $('.product-reviews-container').on('click', '.form-comment-parent-btn', function() {
+            const commentId = $(this).data('form-comment-parent-id');
+            const commentsForm = $(`#block-comment-parent-form${commentId}`);
+
+            // Скрываем все другие блоки форм, кроме текущего
+            $(`[id^="block-comment-parent-form"]`).not(commentsForm).hide();
+
+            // Показываем или скрываем текущую форму в зависимости от её текущего состояния
+            commentsForm.toggle();
+        });
+
+
+        $('.product-reviews-container').on('click', '.form-comment-child-btn', function() {
+            const commentId = $(this).data('form-comment-child-id');
+            const commentForm = $('#block-comment-child-form' + commentId);
+
+            // Скрываем все другие блоки форм, кроме текущего
+            $('[id^="block-comment-child-form"]').not(commentForm).hide();
+
+            // Показываем или скрываем текущую форму в зависимости от её текущего состояния
+            commentForm.toggle();
+        });
+
     });
 </script>
