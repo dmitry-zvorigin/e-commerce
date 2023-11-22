@@ -33,6 +33,8 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/cart', [CartController::class,'index'])->name('cart');
 Route::get('/wishlist', [WishController::class,'index'])->name('wishlist');
 
+Route::post('/add-to-wishlist', [WishController::class,'addToWishlist'])->name('wishlist.add');
+
 Route::get('/review/{product}/create', [ReviewsController::class, 'createReview'])->name('review.create');
 Route::post('/review/{product}/store', [ReviewsController::class,'storeReview'])->name('review.store');
 

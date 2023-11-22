@@ -164,7 +164,7 @@ class ReviewsController extends Controller
     // Подгружаем комментарии у отзывов
     public function loadComments(Review $review) : View
     {
-        $comments = $review->comments()->whereNull('parent_comment_id')->get();
+        $comments = $review->comments()->with('user')->whereNull('parent_comment_id')->get();
         // $comments = $review->commentsParent();
         
 
@@ -176,7 +176,7 @@ class ReviewsController extends Controller
     {
         // try {
             // dump($commentParent->commentsChildren());
-            $commentsChild = $commentParent->commentsChildren()->get();
+            $commentsChild = $commentParent->commentsChildren()->with('user')->get();
 
             return view('components.product-review-comment-child', ['commentsChild' => $commentsChild, 'commentParent' => $commentParent]);
         // } catch (\Exception $e) {
