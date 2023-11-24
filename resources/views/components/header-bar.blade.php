@@ -23,7 +23,16 @@
         </div>
         <div class="d-flex flex-row">
             <div class="ms-3">
-                <button type="button" class="btn btn-primary position-relative mr-4">
+                <a href="{{ route('wishlist') }}" class="btn btn-primary position-relative mr-4">
+                    Избранное
+                    @if($countWishList !== 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ $countWishList }}
+                            <span class="visually-hidden">непрочитанные сообщения</span>
+                        </span>
+                    @endif
+                </a>
+                {{-- <button type="button" class="btn btn-primary position-relative mr-4">
                     Избранное
                     @if($countWishList !== 0)
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -32,7 +41,7 @@
                         </span>
                     @endif
 
-                </button>
+                </button> --}}
             </div>
             <div class="mx-3">
                 <button type="button" class="btn btn-primary position-relative">

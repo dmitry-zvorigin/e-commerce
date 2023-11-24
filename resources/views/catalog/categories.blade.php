@@ -50,7 +50,7 @@
         <div class="col-8">
             {{-- <h4>Найдено: {{ $category->products->total() }} товаров</h4> --}}
             {{-- <form id="sortingForm" method="get" action="{{ route('catalog-category') }}"> --}}
-                <div class="input-group">
+                <div class="input-group mb-4">
                     <select class="form-select" id="sorting-select" name="sorting">
                         <option value="">-- Выберите сортировку --</option>
                         <option value="price_asc" @selected(request('sorting') == 'price_asc')>Сначала недорогие</option>
@@ -65,90 +65,10 @@
             </form>
 
             @foreach ($category->products as $product)
-                <div class="card mb-4">
-                    <div class="row g-0">
-                        <div class="col-md-4">
-                            @if ($product->images->isNotEmpty())
-                                <img class="bd-placeholder-img img-thumbnail" src="{{ asset('gallery_products/thumbnails/' . $product->images->first()->thumbnail) }}" alt="Описание изображения" width="200" height="200">
-                            @else
-                                <svg class="bd-placeholder-img img-thumbnail" width="200" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false"><rect width="100%" height="100%" fill="#868e96"></rect><text x="50%" y="50%" fill="#dee2e6" dy=".3em"></text></svg>
-                            @endif
-                        </div>
-                        <div class="col-md-6">
-                                <div class="card-body">
-                                    <a href="{{ route('catalog.product', ['category' => $category->slug, 'product' => $product->slug]) }}">
-                                        <div>
-                                            <h5 class="card-title">{{ $product->name }}</h5>
-                                            <p class="card-text">{{ $product->detail }}</ya-tr-span></p>
-                                        </div>
-                                    </a>
-                                    <div class="product-rating d-flex align-items-center">
-                                        @for ($i = 0; $i < 5; $i++)
-                                            @if ($i < round($product->rating))
-                                                <i class="fa fa-star"></i>
-                                            @else
-                                                <i class="fa fa-star-o"></i>
-                                            @endif
-                                        @endfor
-                                        <div class="ms-2">
-                                            {{ $product->reviews->count() }}
-                                        </div>
-
-                                    </div>
-                                </div>
-                        </div>
-                        <div class="col-md-2 mt-4">
-                            <h5 class="card-price">{{ $product->price }}</h5>
-                            <div class="mb-3">
-                                <form method="post" action="">
-                                    @csrf
-                                    <button class="btn btn-success" type="submit">В избранное</button>
-                                </form>
-                            </div>
-                            <div>
-                                <form method="post" action="">
-                                    {{-- {{ route('cart.addToCart') }} --}}
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <button class="btn btn-success" type="submit">Купить</button>
-                                </form>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
+                <x-product-card :product="$product"/>
             @endforeach
 
 
-            <table id="productTable" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Название продукта</th>
-                        <th>Цена</th>
-                        <th>Действия</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($category->products as $product)
-                        <tr>
-                            {{-- <td>
-                                <a href="{{ route('catalog.product', ['product' => $product->id]) }}">{{ $product->name }}</a>
-                            </td> --}}
-                            <td>{{ $product->name }}</td>
-                            <td>{{ $product->price }}</td>
-                            <td>{{ $product->color }}</td>
-                            <td>
-
-                                {{-- <form method="post" action="{{ route('cart.addToCart') }}">
-                                    @csrf
-                                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <button class="btn btn-success" type="submit">Купить</button>
-                                </form> --}}
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
             {{-- <div>
                 {{ $category->products->withQueryString()->links('vendor.pagination.simple-bootstrap-5') }}
             </div> --}}

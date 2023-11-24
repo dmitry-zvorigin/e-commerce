@@ -26,6 +26,7 @@ class HeaderBar extends Component
         $categories = Category::all();
 
         $countWishList = Wishlist::Where('user_id', auth()->user()->id)->count();
+        // $countWishList = 1;
 
         return view('components.header-bar', ['categories' => $categories, 'countWishList' => $countWishList]);
     }
